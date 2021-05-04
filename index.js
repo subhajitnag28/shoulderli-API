@@ -1,6 +1,6 @@
 const express = require("express"),
-    https = require('https'),
-    fs = require('fs'),
+    // https = require('https'),
+    // fs = require('fs'),
     cors = require("cors"),
     app = express();
 
@@ -12,13 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static('public'));
 app.use('/resume', express.static(__dirname + '/uploads'));
-app.set('port', 3000);
+// app.set('port', 7000);
 
 for (const r in routes) {
     app.use("/" + r, routes[r]);
 }
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 7000;
 app.listen(port, () => {
     console.log("Server is running on port :", port);
 });

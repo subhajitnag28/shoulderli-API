@@ -138,28 +138,4 @@ router.get("/user-lists/:userType", authorization, (req, res) => {
     }
 });
 
-//serach users with criteria
-router.post("/search-users", authorization, (req, res) => {
-    const requestBody = req.body,
-        { fromAge, toAge, gender, height } = requestBody;
-    const data = {
-        fromAge,
-        toAge,
-        gender,
-        height
-    };
-    userService.searchUsers(data).then((result) => {
-        res.status(result.code).json({
-            code: result.code,
-            data: result.data,
-            message: result.message
-        });
-    }).catch((error) => {
-        res.status(error.code).json({
-            code: error.code,
-            message: error.message
-        });
-    });
-});
-
 module.exports = router;
