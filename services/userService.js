@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
+const mongodb = require('mongodb');
 const dbConnection = require("../dbConnection");
 const config = require("../config");
+const ObjectId = mongodb.ObjectID;
 
 // check email exist
 const checkEmailExist = (user, { email }) => {
@@ -138,5 +140,74 @@ const userLists = () => {
     });
 };
 
+// user update 
+const userUpdate = (data) => {
+    return new Promise(async (resolve, reject) => {
+        const user = dbConnection.db(config.dbName).collection('user');
+        try {
+            const isEmailExist = await checkEmailExist(user, data);
+            if (!isEmailExist) {
+                reject({ code: 404, message: "User not found" });
+            } else {
+                if (data.checkAadhaar) {
+                    let updatedData = data;
+                    const userId = updatedData._id;
+                    delete updatedData.checkAadhaar;
+                    delete updatedData._id;
+                    try {
+                        const isAadhaarExist = await checkAadhaarExist(user, updatedData);
+                        if (!isAadhaarExist) {
+                            user.updateOne({
+                                _id: new ObjectId(userId)
+                            }, {
+                                $set: updatedData
+                            }, {
+                                upsert: true
+                            }, (error5, result) => {
+                                if (error5) {
+                                    reject({ code: 500, message: "Internal server error" });
+                                } else {
+                                    userDetails(updatedData).then((result1) => {
+                                        resolve(result1);
+                                    }).catch((error) => {
+                                        reject({ code: 404, message: "Something went wrong" });
+                                    });
+                                }
+                            });
+                        } else {
+                            reject({ code: 404, message: "Aadhaar number already exist", });
+                        }
+                    } catch (error2) {
+                        reject({ code: 500, message: "Internal server error" });
+                    }
+                } else {
+                    let updatedData = data;
+                    const userId = updatedData._id;
+                    delete updatedData.checkAadhaar;
+                    delete updatedData._id;
+                    user.updateOne({
+                        _id: new ObjectId(userId)
+                    }, {
+                        $set: updatedData
+                    }, {
+                        upsert: true
+                    }, (error4, result) => {
+                        if (error4) {
+                            reject({ code: 500, message: "Internal server error" });
+                        } else {
+                            userDetails(updatedData).then((result1) => {
+                                resolve(result1);
+                            }).catch((error) => {
+                                reject({ code: 404, message: "Something went wrong" });
+                            });
+                        }
+                    });
+                }
+            }
+        } catch (error1) {
+            reject({ code: 500, message: "Internal server error" });
+        }
+    });
+};
 
-module.exports = { registration, login, userDetails, userLists };
+module.exports = { registration, login, userDetails, userLists, userUpdate };

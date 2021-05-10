@@ -140,4 +140,29 @@ router.get("/user-lists/:userType", authorization, (req, res) => {
     }
 });
 
+// update user details
+router.post("/update-user-details", authorization, (req, res) => {
+    const requestBody = req.body,
+        { email } = requestBody;
+    if (email) {
+        userService.userUpdate(requestBody).then((result) => {
+            res.status(result.code).json({
+                code: result.code,
+                data: result.data,
+                message: result.message
+            });
+        }).catch((error) => {
+            res.status(error.code).json({
+                code: error.code,
+                message: error.message
+            });
+        });
+    } else {
+        res.status(404).json({
+            code: 404,
+            message: "Email is required"
+        });
+    }
+});
+
 module.exports = router;
