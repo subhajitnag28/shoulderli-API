@@ -10,7 +10,7 @@ const saltRounds = 9;
 // user registration
 router.post("/registration", (req, res) => {
     const requestBody = req.body,
-        { name, email, phoneNumber, address, city, pincode, gender, dob, age, height, aadhaarNumber, highestQualification, password, funcArea, resume, acceptTermsAndCondition, userType } = requestBody;
+        { name, email, phoneNumber, address, city, pincode, gender, dob, age, height, aadhaarNumber, highestQualification, password, funcArea, resume, resumeFile, acceptTermsAndCondition, userType, userImage } = requestBody;
     // check all fields or not
     if (name && email && phoneNumber && address && city && pincode && gender && dob && height && aadhaarNumber && highestQualification && password && funcArea && resume && acceptTermsAndCondition && userType) {
         const data = {
@@ -29,8 +29,10 @@ router.post("/registration", (req, res) => {
             password: bcrypt.hashSync(password.trim(), saltRounds),
             funcArea,
             resume,
+            resumeFile,
             acceptTermsAndCondition,
             userType,
+            userImage,
             createdTimestamp: new Date().getTime(),
             modifiedTimestamp: new Date().getTime(),
             token: createToken(email, config.secret)
